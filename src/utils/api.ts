@@ -71,98 +71,13 @@ export async function createMemo(
 }
 
 /**
- * Upload a resource (image, etc.)
- * @param file File to upload
- * @returns Uploaded resource
- */
-export async function uploadResource(file: File): Promise<Resource> {
-  return new Promise((resolve, reject) => {
-    getConfig(async (config) => {
-      if (!config.apiUrl) {
-        reject(new Error('API URL is not set'));
-        return;
-      }
-
-      try {
-        // Try to use FormData upload first
-        const url = `${config.apiUrl.replace(/\/$/, '')}/api/v1/resources`;
-        
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        const headers: HeadersInit = {};
-        
-        if (config.apiTokens) {
-          headers['Authorization'] = `Bearer ${config.apiTokens}`;
-        }
-        
-        const response = await fetch(url, {
-          method: 'POST',
-          headers,
-          body: formData,
-        });
-        
-        if (!response.ok) {
-          // If FormData upload fails, try base64 upload
-          const reader = new FileReader();
-          reader.onload = async (e) => {
-            try {
-              if (e.target && typeof e.target.result === 'string') {
-                const base64String = e.target.result.split(',')[1];
-                
-                const resourceData = {
-                  content: base64String,
-                  filename: file.name,
-                  type: file.type
-                };
-                
-                const base64Response = await fetch(url, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${config.apiTokens}`
-                  },
-                  body: JSON.stringify(resourceData)
-                });
-                
-                if (!base64Response.ok) {
-                  throw new Error(`Base64 upload failed: ${base64Response.status} ${base64Response.statusText}`);
-                }
-                
-                const base64Result = await base64Response.json();
-                resolve(base64Result.data as Resource);
-              } else {
-                throw new Error('Failed to read file as base64');
-              }
-            } catch (error) {
-              reject(error);
-            }
-          };
-          
-          reader.onerror = (error) => {
-            reject(error);
-          };
-          
-          reader.readAsDataURL(file);
-        } else {
-          const result = await response.json();
-          resolve(result.data as Resource);
-        }
-      } catch (error) {
-        reject(error);
-      }
-    });
-  });
-}
-
-/**
- * Upload a resource using base64 data
+ * Upload a file to API using base64 data
  * @param base64String Base64 encoded content
  * @param filename Filename
  * @param type File type
  * @returns Uploaded resource
  */
-export async function uploadResourceBase64(
+export async function uploadFileToAPI(
   base64String: string,
   filename: string,
   type: string

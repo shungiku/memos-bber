@@ -41,23 +41,23 @@
    "submitBtn": {
       "message": "Save"
    },
-   "picDrag": {
-      "message": "Drag upload the image"
+   "fileDrag": {
+      "message": "Drag and drop to upload file"
    },
-   "picCancelDrag": {
+   "fileCancelDrag": {
       "message": "Cancel upload"
    },
-   "picUploading": {
-      "message": "Upload the picture..."
+   "fileUploading": {
+      "message": "Uploading file..."
    },
-   "picSuccess": {
+   "fileSuccess": {
       "message": "Upload completed"
    },
-   "picFailed": {
-      "message": "Uploading failed"
+   "fileFailed": {
+      "message": "Upload failed"
    },
-   "picPending": {
-      "message": "Image uploading is in progress"
+   "filePending": {
+      "message": "File upload in progress"
    },
    "saveSuccess": {
       "message": "Save Info Success!"
@@ -76,5 +76,8 @@
    },
    "invalidToken": {
       "message": "Invalid token or url 😭"
+   },
+   "searchNone": {
+      "message": "No tags found"
    }
 }

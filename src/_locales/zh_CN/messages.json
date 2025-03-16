@@ -41,23 +41,23 @@
    "submitBtn": {
       "message": "记下"
    },
-   "picDrag": {
-      "message": "拖拽到窗口上传该图片"
+   "fileDrag": {
+      "message": "拖拽到窗口上传文件"
    },
-   "picCancelDrag": {
+   "fileCancelDrag": {
       "message": "取消上传"
    },
-   "picUploading": {
-      "message": "图片上传中……"
+   "fileUploading": {
+      "message": "文件上传中……"
    },
-   "picSuccess": {
+   "fileSuccess": {
       "message": "上传完成"
    },
-   "picFailed": {
-      "message": "上传图片失败"
+   "fileFailed": {
+      "message": "上传文件失败"
    },
-   "picPending": {
-      "message": "有图片等待上传"
+   "filePending": {
+      "message": "有文件等待上传"
    },
    "saveSuccess": {
       "message": "保存信息成功"
@@ -82,5 +82,8 @@
    },
    "invalidToken": {
       "message": "无效的 token 或 url 😭"
+   },
+   "searchNone": {
+      "message": "未找到标签"
    }
 }

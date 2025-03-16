@@ -52,8 +52,8 @@ chrome.contextMenus.onClicked.addListener((info) => {
     { open_action: "save_text", open_content: '' },
     (items) => {
       if (items.open_action === 'upload_image') {
-        // Show warning if image upload is in progress
-        alert(chrome.i18n.getMessage("picPending"));
+        // Show warning if file upload is in progress
+        alert(chrome.i18n.getMessage("filePending"));
       } else {
         // Save text
         saveConfig({

@@ -1,13 +1,16 @@
 import { getConfig, saveConfig } from '../utils/storage';
 import { 
   createMemo, 
-  uploadResourceBase64, 
   linkResourcesToMemo,
   getTags
 } from '../utils/api';
 import { Visibility, ResourceItem } from '../types';
 import { initializeI18n } from '../utils/i18n';
 import { showMessage } from '../utils/message';
+import { 
+  processFileUpload, 
+  urlToFile
+} from '../utils/fileHandler';
 
 // Add ViewImage type definition
 declare global {
@@ -16,23 +19,6 @@ declare global {
       init: (selector: string) => void;
     };
   }
-}
-
-/**
- * Format date to string in format YYYYMMDDHHmmss
- * @returns Formatted date string
- */
-function formatDateForFilename(): string {
-  const now = new Date();
-  
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
-  const seconds = String(now.getSeconds()).padStart(2, '0');
-  
-  return `${year}${month}${day}${hours}${minutes}${seconds}`;
 }
 
 /**
@@ -154,8 +140,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Restore previous content
     if (info.open_action === 'upload_image') {
-      // Image upload mode
-      uploadImage(info.open_content);
+      // File upload mode
+      handleFileUpload(info.open_content);
     } else if (textareaElement) {
       textareaElement.value = info.open_content;
     }
@@ -504,7 +490,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Initialize drag & drop for image upload
+  // Initialize drag & drop for file upload
   initDrag();
 
   // Resource upload button event listener
@@ -548,7 +534,7 @@ document.addEventListener('DOMContentLoaded', () => {
     inFileElement.addEventListener('change', (event) => {
       const target = event.target as HTMLInputElement;
       if (target.files && target.files.length > 0) {
-        uploadImage(target.files[0]);
+        handleFileUpload(target.files[0]);
       }
     });
   }
@@ -564,7 +550,7 @@ function initDrag(): void {
   textareaElement.addEventListener('dragenter', (ev) => {
     ev.preventDefault();
     if ((ev.target as HTMLElement).className === 'common-editor-inputer') {
-      showMessage(chrome.i18n.getMessage("picDrag"));
+      showMessage(chrome.i18n.getMessage("fileDrag"));
       document.body.style.opacity = '0.3';
     }
     (ev.dataTransfer as DataTransfer).dropEffect = 'copy';
@@ -580,110 +566,56 @@ function initDrag(): void {
     document.body.style.opacity = '1';
     const files = (ev.dataTransfer as DataTransfer).files;
     if (files && files.length > 0) {
-      uploadImage(files[0]);
+      handleFileUpload(files[0]);
     }
   });
 
   textareaElement.addEventListener('dragleave', (ev) => {
     ev.preventDefault();
     if ((ev.target as HTMLElement).className === 'common-editor-inputer') {
-      showMessage(chrome.i18n.getMessage("picCancelDrag"));
+      showMessage(chrome.i18n.getMessage("fileCancelDrag"));
       document.body.style.opacity = '1';
     }
   });
 }
 
 /**
- * Upload an image
- * @param file File to upload
+ * Handle file upload from various sources
+ * @param fileOrUrl File object or URL string
  */
-async function uploadImage(file: File | string): Promise<void> {
-  // If file is a string (from storage), try to convert it to a File object
-  if (typeof file === 'string') {
+async function handleFileUpload(fileOrUrl: File | string): Promise<void> {
+  let file: File;
+  
+  // Convert string to File if needed
+  if (typeof fileOrUrl === 'string') {
     try {
-      // Try to fetch the file from a URL
-      const response = await fetch(file);
-      const blob = await response.blob();
-      file = new File([blob], 'image.jpg', { type: 'image/jpeg' });
+      file = await urlToFile(fileOrUrl);
     } catch (error) {
       console.error('Error converting string to file:', error);
-      showMessage(chrome.i18n.getMessage("picFailed"));
+      showMessage(chrome.i18n.getMessage("fileFailed"));
       return;
     }
+  } else {
+    file = fileOrUrl;
   }
 
-  showMessage(chrome.i18n.getMessage("picUploading"));
+  showMessage(chrome.i18n.getMessage("fileUploading"));
 
   try {
-    // Read file as base64
-    const base64String = await readFileAsBase64(file);
+    // Process and upload the file
+    const resource = await processFileUpload(file);
     
-    // Upload the image
-    await uploadImageWithBase64(base64String, file);
-  } catch (error) {
-    console.error('Error uploading image:', error);
-    showMessage(chrome.i18n.getMessage("picFailed"));
-    
-    // Clear upload state
-    saveConfig({
-      open_action: '',
-      open_content: '',
-      resourceIdList: []
-    });
-  }
-}
-
-/**
- * Read a file as base64
- * @param file File to read
- * @returns Base64 string
- */
-function readFileAsBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      if (e.target && typeof e.target.result === 'string') {
-        const base64String = e.target.result.split(',')[1];
-        resolve(base64String);
-      } else {
-        reject(new Error('Failed to read file as base64'));
+    // Save resource information
+    getConfig((info) => {
+      if (!info.status) {
+        showMessage(chrome.i18n.getMessage("placeApiUrl"));
+        return;
       }
-    };
-    reader.onerror = (error) => {
-      reject(error);
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-/**
- * Upload an image with base64 data
- * @param base64String Base64 encoded image data
- * @param file Original file
- */
-async function uploadImageWithBase64(base64String: string, file: File): Promise<void> {
-  getConfig(async (info) => {
-    if (!info.status) {
-      showMessage(chrome.i18n.getMessage("placeApiUrl"));
-      return;
-    }
-
-    // Generate a new filename with timestamp
-    const oldName = file.name.split('.');
-    const fileExt = file.name.split('.').pop() || '';
-    const now = formatDateForFilename();
-    const newName = `${oldName[0]}_${now}.${fileExt}`;
-
-    try {
-      // Upload the resource using base64
-      const resource = await uploadResourceBase64(base64String, newName, file.type);
-      
-      console.log('Uploaded resource:', resource);
       
       // Add resource to the list
       const resourceList = info.resourceIdList || [];
       
-      // リソース情報を適切に保存
+      // Create resource item
       const resourceItem: ResourceItem = {
         name: resource.name || '',
         uid: resource.uid || resource.id || '',
@@ -699,21 +631,20 @@ async function uploadImageWithBase64(base64String: string, file: File): Promise<
         open_content: '',
         resourceIdList: resourceList
       }, () => {
-        showMessage(chrome.i18n.getMessage("picSuccess"));
+        showMessage(chrome.i18n.getMessage("fileSuccess"));
       });
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      
-      // Clear upload state
-      saveConfig({
-        open_action: '',
-        open_content: '',
-        resourceIdList: []
-      }, () => {
-        showMessage(chrome.i18n.getMessage("picFailed"));
-      });
-    }
-  });
+    });
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    showMessage(chrome.i18n.getMessage("fileFailed"));
+    
+    // Clear upload state
+    saveConfig({
+      open_action: '',
+      open_content: '',
+      resourceIdList: []
+    });
+  }
 }
 
 /**
