@@ -1,6 +1,3 @@
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import 'dayjs/locale/zh-cn';
 import { getConfig, saveConfig } from '../utils/storage';
 import { 
   createMemo, 
@@ -21,9 +18,22 @@ declare global {
   }
 }
 
-// Configure dayjs
-dayjs.extend(relativeTime);
-dayjs.locale('zh-cn');
+/**
+ * Format date to string in format YYYYMMDDHHmmss
+ * @returns Formatted date string
+ */
+function formatDateForFilename(): string {
+  const now = new Date();
+  
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  
+  return `${year}${month}${day}${hours}${minutes}${seconds}`;
+}
 
 /**
  * Set theme based on user preference or system preference
@@ -661,7 +671,7 @@ async function uploadImageWithBase64(base64String: string, file: File): Promise<
     // Generate a new filename with timestamp
     const oldName = file.name.split('.');
     const fileExt = file.name.split('.').pop() || '';
-    const now = dayjs().format('YYYYMMDDHHmmss');
+    const now = formatDateForFilename();
     const newName = `${oldName[0]}_${now}.${fileExt}`;
 
     try {
