@@ -4,7 +4,7 @@ import { MemosConfig } from '../types';
 const defaultConfig: MemosConfig = {
   apiUrl: '',
   apiTokens: '',
-  memo_lock: 'PUBLIC',
+  memo_lock: 'PRIVATE',
   open_action: '',
   open_content: '',
   userid: '',
