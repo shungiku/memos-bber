@@ -1,0 +1,30 @@
+{
+  "name": "memos-bber",
+  "version": "1.0.0",
+  "description": "Chrome extension for posting to memos",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "bump:patch": "node scripts/bump-version.js patch",
+    "bump:minor": "node scripts/bump-version.js minor",
+    "bump:major": "node scripts/bump-version.js major",
+    "package": "node scripts/build.js",
+    "release": "npm run bump:patch && npm run package"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/chrome": "^0.0.309",
+    "@types/fs-extra": "^11.0.4",
+    "archiver": "^6.0.1",
+    "fs-extra": "^11.3.0",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.2"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.13"
+  }
+}

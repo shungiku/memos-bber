@@ -1,0 +1,80 @@
+{
+   "extName": {
+      "message": "Memos-bber"
+   },
+   "actionTitle": {
+      "message": "Send Memos"
+   },
+   "extDescription": {
+      "message": "Post text/files to your Memos instance"
+   },
+   "sendTo": {
+      "message": "SendTo Memos \"%s\""
+   },
+   "sendLinkTo": {
+      "message": "Send link to Memos"
+   },
+   "sendImageTo": {
+      "message": "Send image to Memos"
+   },
+   "saveBtn": {
+      "message": "Save"
+   },
+   "placeApiUrl": {
+      "message": "Memos Self Home Url"
+   },
+   "placeApiTokens": {
+      "message": "Memos Access Tokens"
+   },
+   "placeContent": {
+      "message": "Any thoughts..."
+   },
+   "lockPrivate": {
+      "message": "Private"
+   },
+   "lockProtected": {
+      "message": "Workspace"
+   },
+   "lockPublic": {
+      "message": "Public"
+   },
+   "submitBtn": {
+      "message": "Save"
+   },
+   "picDrag": {
+      "message": "Drag upload the image"
+   },
+   "picCancelDrag": {
+      "message": "Cancel upload"
+   },
+   "picUploading": {
+      "message": "Upload the picture..."
+   },
+   "picSuccess": {
+      "message": "Upload completed"
+   },
+   "picFailed": {
+      "message": "Uploading failed"
+   },
+   "picPending": {
+      "message": "Image uploading is in progress"
+   },
+   "saveSuccess": {
+      "message": "Save Info Success!"
+   },
+   "getTabFailed": {
+      "message": "Get Tab Failed 😭"
+   },
+   "memoUploading": {
+      "message": "Sending"
+   },
+   "memoSuccess": {
+      "message": "Success! 😊"
+   },
+   "memoFailed": {
+      "message": "Failed! 😭"
+   },
+   "invalidToken": {
+      "message": "Invalid token or url 😭"
+   }
+}
