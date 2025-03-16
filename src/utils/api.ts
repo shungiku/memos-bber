@@ -1,59 +1,5 @@
-import { ApiResponse, Memo, Resource, ResourceItem, Visibility } from '../types';
+import { Memo, Resource, ResourceItem, Visibility } from '../types';
 import { getConfig } from './storage';
-
-/**
- * Send API request
- * @param endpoint API endpoint
- * @param method HTTP method
- * @param data Request data
- * @returns Response
- */
-async function fetchAPI<T>(
-  endpoint: string,
-  method: 'GET' | 'POST' | 'PATCH' | 'DELETE' = 'GET',
-  data?: any
-): Promise<ApiResponse<T>> {
-  return new Promise((resolve, reject) => {
-    getConfig(async (config) => {
-      if (!config.apiUrl) {
-        reject(new Error('API URL is not set'));
-        return;
-      }
-
-      const url = `${config.apiUrl.replace(/\/$/, '')}${endpoint}`;
-      
-      try {
-        const headers: HeadersInit = {
-          'Content-Type': 'application/json',
-        };
-        
-        if (config.apiTokens) {
-          headers['Authorization'] = `Bearer ${config.apiTokens}`;
-        }
-        
-        const options: RequestInit = {
-          method,
-          headers,
-        };
-        
-        if (data && method !== 'GET') {
-          options.body = JSON.stringify(data);
-        }
-        
-        const response = await fetch(url, options);
-        
-        if (!response.ok) {
-          throw new Error(`API request failed: ${response.status} ${response.statusText}`);
-        }
-        
-        const result = await response.json();
-        resolve(result as ApiResponse<T>);
-      } catch (error) {
-        reject(error);
-      }
-    });
-  });
-}
 
 /**
  * Create a memo
@@ -365,15 +311,6 @@ export async function linkResourcesToMemo(
 }
 
 /**
- * Get user status
- * @returns User status
- */
-export async function getUserStatus(): Promise<any> {
-  const response = await fetchAPI<any>('/api/v1/auth/status', 'POST');
-  return response.data;
-}
-
-/**
  * Get memo tags
  * @param userId User ID
  * @returns Tags with counts
@@ -432,28 +369,4 @@ export async function getTags(userId: string): Promise<any> {
       }
     });
   });
-}
-
-/**
- * Get memo by ID
- * @param memoId Memo ID
- * @returns Memo
- */
-export async function getMemoById(memoId: string): Promise<Memo> {
-  const response = await fetchAPI<Memo>(`/api/v1/${memoId}`, 'GET');
-  return response.data;
-}
-
-/**
- * Archive memo
- * @param memoName Memo name
- * @param memoUid Memo UID
- * @returns Archived memo
- */
-export async function archiveMemo(memoName: string, memoUid: string): Promise<any> {
-  const response = await fetchAPI<any>(`/api/v1/${memoName}`, 'PATCH', {
-    uid: memoUid,
-    rowStatus: 'ARCHIVED'
-  });
-  return response.data;
 } 
