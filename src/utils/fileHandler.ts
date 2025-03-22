@@ -1,5 +1,6 @@
 import { Resource } from '../types';
 import { uploadFileToAPI } from './api';
+import mime from 'mime/lite';
 
 /**
  * Read a file as base64
@@ -77,15 +78,77 @@ export async function processFileUpload(file: File): Promise<Resource> {
 }
 
 /**
+ * Extract filename from URL
+ * @param url URL string
+ * @returns Extracted filename or default name
+ */
+function extractFilenameFromUrl(url: string): string {
+  try {
+    // Create URL object to parse the URL
+    const urlObj = new URL(url);
+    
+    // Get the pathname from URL
+    const pathname = urlObj.pathname;
+    
+    // Split path by '/' and get the last part
+    const segments = pathname.split('/');
+    const lastSegment = segments[segments.length - 1];
+    
+    // If last segment exists and contains a filename
+    if (lastSegment && lastSegment.length > 0) {
+      // Remove any query parameters
+      const filename = lastSegment.split('?')[0];
+      
+      // Remove any hash fragments
+      return filename.split('#')[0];
+    }
+    
+    // Return default filename if extraction fails
+    return 'file';
+  } catch (error) {
+    console.warn('Error extracting filename from URL:', error);
+    return 'file';
+  }
+}
+
+/**
  * Convert string URL to File object
  * @param url URL string
  * @returns File object
  */
 export async function urlToFile(url: string): Promise<File> {
   try {
+    // Fetch the file from URL
     const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch file: ${response.status} ${response.statusText}`);
+    }
+    
+    // Get content type from response headers
+    let contentType = response.headers.get('Content-Type') || '';
+    
+    // Use octet-stream as fallback if content type is not provided
+    if (!contentType) {
+      contentType = 'application/octet-stream';
+    }
+    
+    // Extract filename from URL
+    let filename = extractFilenameFromUrl(url);
+    
+    // If filename doesn't have extension, add one based on content type
+    if (!filename.includes('.')) {
+      // Add extension based on content type using mime package
+      const extension = mime.getExtension(contentType);
+      if (extension) {
+        filename = `${filename}.${extension}`;
+      }
+    }
+    
+    // Get file content as blob
     const blob = await response.blob();
-    return new File([blob], 'file.jpg', { type: 'image/jpeg' });
+    
+    // Create and return File object with proper name and type
+    return new File([blob], filename, { type: contentType });
   } catch (error) {
     console.error('Error converting URL to file:', error);
     throw error;

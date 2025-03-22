@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      mime:
+        specifier: ^4.0.6
+        version: 4.0.6
     devDependencies:
       '@types/chrome':
         specifier: ^0.0.309
@@ -387,6 +391,11 @@ packages:
 
   lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+
+  mime@4.0.6:
+    resolution: {integrity: sha512-4rGt7rvQHBbaSOF9POGkk1ocRP16Md1x36Xma8sz8h8/vfCUI2OtEIeCqe4Ofes853x4xDoPiFLIT47J5fI/7A==}
+    engines: {node: '>=16'}
+    hasBin: true
 
   minimatch@5.1.6:
     resolution: {integrity: sha512-lKwV/1brpG6mBUFHtb7NUmtABCb2WZZmm2wNiOA5hAb8VdCS4B3dtMWyvcoViccwAW/COERjXLt0zP1zXUN26g==}
@@ -799,6 +808,8 @@ snapshots:
       readable-stream: 2.3.8
 
   lodash@4.17.21: {}
+
+  mime@4.0.6: {}
 
   minimatch@5.1.6:
     dependencies:
