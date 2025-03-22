@@ -40,20 +40,4 @@ export function saveConfig(
   callback?: () => void
 ): void {
   chrome.storage.sync.set(config, callback ? callback : () => {});
-}
-
-/**
- * Get a specific configuration value
- * @param key Key to get
- * @param defaultValue Default value
- * @param callback Callback function to receive the value
- */
-export function getConfigValue<K extends keyof MemosConfig>(
-  key: K,
-  defaultValue: MemosConfig[K],
-  callback: (value: MemosConfig[K]) => void
-): void {
-  chrome.storage.sync.get({ [key]: defaultValue }, (items) => {
-    callback(items[key] as MemosConfig[K]);
-  });
 } 
