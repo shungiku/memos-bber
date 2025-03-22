@@ -1,12 +1,17 @@
 // Type definitions for Memos API
 
+// Action types for content and files
+export type ContentActionType = 'SAVE_TEXT' | 'NONE';
+
 // Configuration type
 export interface MemosConfig {
   apiUrl: string;
   apiTokens: string;
   memo_lock: 'PUBLIC' | 'PRIVATE' | 'PROTECTED' | '';
-  open_action: string;
-  open_content: string;
+  // New fields with better type safety
+  contentActionType: ContentActionType;  // Action type for content operations
+  pendingContent: string;                // Content waiting to be saved
+  tempFileUrl: string;                   // Temporary URL for file being uploaded
   userid: string;
   resourceIdList: ResourceItem[];
 }

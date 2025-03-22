@@ -56,9 +56,6 @@
    "fileFailed": {
       "message": "Upload failed"
    },
-   "filePending": {
-      "message": "File upload in progress"
-   },
    "saveSuccess": {
       "message": "Save Info Success!"
    },

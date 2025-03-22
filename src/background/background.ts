@@ -1,4 +1,4 @@
-import { saveConfig } from '../utils/storage';
+import { setPendingText } from '../utils/storage';
 
 // Handler for when the extension is installed
 chrome.runtime.onInstalled.addListener(() => {
@@ -49,18 +49,11 @@ chrome.contextMenus.onClicked.addListener((info) => {
   
   // Get current settings
   chrome.storage.sync.get(
-    { open_action: "save_text", open_content: '' },
+    { contentActionType: "NONE", pendingContent: '', fileActionType: 'NONE' },
     (items) => {
-      if (items.open_action === 'upload_image') {
-        // Show warning if file upload is in progress
-        alert(chrome.i18n.getMessage("filePending"));
-      } else {
-        // Save text
-        saveConfig({
-          open_action: "save_text",
-          open_content: items.open_content + tempCont
-        });
-      }
+      // Add text (regardless of file upload state)
+      const newContent = items.pendingContent + tempCont;
+      setPendingText(newContent);
     }
   );
 }); 

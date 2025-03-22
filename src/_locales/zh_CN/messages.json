@@ -56,9 +56,6 @@
    "fileFailed": {
       "message": "上传文件失败"
    },
-   "filePending": {
-      "message": "有文件等待上传"
-   },
    "saveSuccess": {
       "message": "保存信息成功"
    },
