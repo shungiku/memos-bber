@@ -60,7 +60,6 @@ function setTheme(theme?: 'light' | 'dark'): void {
       lightIcon.style.display = 'none';
     }
   }
-
   // Save theme preference
   localStorage.setItem('theme', theme);
 }
@@ -236,8 +235,6 @@ document.addEventListener('DOMContentLoaded', () => {
           return response.json();
         })
         .then(data => {
-          console.log("Auth response:", data);
-          
           // Extract user ID from name (format: "users/1") or directly from id
           let userId = null;
           if (data && data.name && data.name.startsWith('users/')) {
@@ -433,12 +430,9 @@ document.addEventListener('DOMContentLoaded', () => {
           
           // Create memo
           const memo = await createMemo(textareaElement.value, visibility);
-          console.log('Created memo:', memo);
           
           // If there are resources, link them to the memo
           if (info.resourceIdList && info.resourceIdList.length > 0) {
-            console.log('Resource list to link:', info.resourceIdList);
-            
             // メモIDの確認
             if (!memo || !memo.name) {
               console.error('Invalid memo object or missing name:', memo);
@@ -457,9 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
               if (validResourceList.length === 0) {
                 console.warn('No valid resources to link');
               } else {
-                console.log('Valid resources to link:', validResourceList);
                 await linkResourcesToMemo(memo.name, validResourceList);
-                console.log('Resources linked successfully');
               }
             } catch (error) {
               console.error('Error linking resources to memo:', error);
@@ -622,7 +614,6 @@ async function handleFileUpload(fileOrUrl: File | string): Promise<void> {
         type: resource.type || ''
       };
       
-      console.log('Adding resource to list:', resourceItem);
       resourceList.push(resourceItem);
 
       // Save resource list

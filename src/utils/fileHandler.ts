@@ -106,7 +106,7 @@ function extractFilenameFromUrl(url: string): string {
     // Return default filename if extraction fails
     return 'file';
   } catch (error) {
-    console.warn('Error extracting filename from URL:', error);
+    console.error('Error extracting filename from URL:', error);
     return 'file';
   }
 }
